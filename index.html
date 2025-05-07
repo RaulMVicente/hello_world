@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Know Thyself: Learning Style Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Press Start 2P', cursive;
+            background-color: #1a202c; /* Dark background */
+            color: #48bb78; /* Green text */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .game-container {
+            background-color: #2d3748; /* Slightly lighter dark */
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.5); /* Green glow */
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+            border: 2px solid #48bb78;
+        }
+        .question-area {
+            margin-bottom: 20px;
+            min-height: 80px; /* Ensure space for question text */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+        .options-area {
+            display: grid;
+            gap: 15px;
+        }
+        .option-button {
+            background-color: #48bb78; /* Green */
+            color: #1a202c; /* Dark text */
+            padding: 15px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+            box-shadow: 0 5px #2f855a; /* Darker green shadow */
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.9rem;
+            word-break: break-word; /* Allow text to break */
+            white-space: normal; /* Allow text to wrap */
+            line-height: 1.4;
+        }
+        .option-button:hover {
+            background-color: #38a169; /* Darker green on hover */
+        }
+        .option-button:active {
+            background-color: #2f855a; /* Even darker green on click */
+            transform: translateY(3px); /* Press effect */
+            box-shadow: 0 2px #2f855a;
+        }
+        .results-area {
+            text-align: left;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px dashed #48bb78;
+        }
+        .results-area h2 {
+            text-align: center;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+        .results-area p {
+            margin-bottom: 10px;
+            font-size: 0.8rem;
+            line-height: 1.6;
+        }
+        .results-area strong {
+            color: #f6e05e; /* Yellow for emphasis */
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 480px) {
+            .game-container {
+                padding: 20px;
+            }
+            .option-button {
+                font-size: 0.7rem;
+                padding: 12px;
+            }
+            .results-area p {
+                font-size: 0.7rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div id="question-number" class="text-sm mb-4">Question 1/15</div>
+        <div id="question-text" class="question-area text-lg mb-6"></div>
+        <div id="options" class="options-area">
+            </div>
+        <div id="results" class="results-area hidden">
+            <h2>Your Learning Preferences</h2>
+            <div id="vark-results"></div>
+            <div id="processing-results" class="mt-6"></div>
+            <p class="mt-6 text-center text-xs italic">
+                Remember, these are preferences, not limitations. Use this knowledge to find learning methods that work best for you!
+            </p>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                text: "When learning how to do something new, I generally prefer to:",
+                options: [
+                    { text: "Watch someone show me how to do it.", style: "V" },
+                    { text: "Listen to someone explain how to do it.", style: "A" },
+                    { text: "Read the instructions or a manual about it.", style: "R" },
+                    { text: "Jump in and try it out myself, learning through practice.", style: "K" }
+                ]
+            },
+            {
+                text: "When trying to understand a complex concept, I find it most helpful to:",
+                options: [
+                    { text: "See diagrams, charts, or visual representations.", style: "V" },
+                    { text: "Discuss it with others or listen to a lecture on it.", style: "A" },
+                    { text: "Read detailed explanations or written materials.", style: "R" },
+                    { text: "Work through examples or simulations.", style: "K" }
+                ]
+            },
+            {
+                text: "When following directions to a new place, I prefer:",
+                options: [
+                    { text: "A map or a GPS with a visual display.", style: "V" },
+                    { text: "Verbal instructions given to me.", style: "A" },
+                    { text: "Written directions.", style: "R" },
+                    { text: "To just start driving and figure it out as I go.", style: "K" }
+                ]
+            },
+            {
+                text: "When learning from a presentation or lecture, I pay most attention to:",
+                options: [
+                    { text: "The presenter's body language, visuals on slides, or demonstrations.", style: "V" },
+                    { text: "The spoken words and explanations.", style: "A" },
+                    { text: "Notes written on a board or provided in handouts.", style: "R" },
+                    { text: "Opportunities to participate or engage with the material hands-on (even if just taking notes actively).", style: "K" }
+                ]
+            },
+            {
+                text: "When encountering new information, I am more likely to:",
+                options: [
+                    { text: "Look for pictures, graphs, or other visual aids to help me understand.", style: "V" },
+                    { text: "Try to hear the information or discuss it to grasp it.", style: "A" },
+                    { text: "Focus on reading and rereading the text.", style: "R" },
+                    { text: "Think about how I can apply or use the information in practice.", style: "K" }
+                ]
+            },
+             {
+                text: "After experiencing something new, I tend to:",
+                options: [
+                    { text: "Mentally picture what happened.", style: "V" },
+                    { text: "Talk about it or think through the sounds and conversations.", style: "A" },
+                    { text: "Write down notes or my thoughts about it.", style: "R" },
+                    { text: "Immediately want to try it again or practice what I learned.", style: "K" }
+                ]
+            },
+            {
+                text: "When solving problems, I am more likely to:",
+                options: [
+                    { text: "Visualize possible solutions or outcomes.", style: "V" },
+                    { text: "Talk through the problem aloud or discuss it with others.", style: "A" },
+                    { text: "Write down the problem and work through it step-by-step on paper.", style: "R" },
+                    { text: "Experiment with different approaches until I find one that works.", style: "K" }
+                ]
+            },
+            {
+                text: "When trying to remember something, I often:",
+                options: [
+                    { text: "Recall an image or a mental snapshot.", style: "V" },
+                    { text: "Remember the sound of words or a conversation.", style: "A" },
+                    { text: "Recall the words I read or wrote down.", style: "R" },
+                    { text: "Remember the physical feeling of doing something related to it.", style: "K" }
+                ]
+            },
+            {
+                text: "When learning a new skill, I prefer to:",
+                options: [
+                    { text: "Watch a demonstration repeatedly.", style: "V" },
+                    { text: "Listen to detailed verbal instructions.", style: "A" },
+                    { text: "Read a comprehensive guide or manual.", style: "R" },
+                    { text: "Practice the skill physically, even if I make mistakes initially.", style: "K" }
+                ]
+            },
+            {
+                text: "When studying for a test, I find it helpful to:",
+                options: [
+                    { text: "Review diagrams, charts, and my visual notes.", style: "V" },
+                    { text: "Read my notes aloud or discuss the material with others.", style: "A" },
+                    { text: "Rewrite my notes or create summaries.", style: "R" },
+                    { text: "Do practice problems or engage in hands-on activities related to the subject.", style: "K" }
+                ]
+            },
+            // Processing Questions (11-15)
+             {
+                text: "When approaching a new subject, I prefer to:",
+                options: [
+                    { text: "Get an overview first to understand the big picture, then fill in the details.", style: "Global" },
+                    { text: "Start with the details and work my way up to understanding the whole.", style: "Sequential" }
+                ]
+            },
+            {
+                text: "I tend to understand something better after I:",
+                options: [
+                    { text: "Try it out or apply it.", style: "Active" },
+                    { text: "Think it through and analyze it.", style: "Reflective" }
+                ]
+            },
+            {
+                text: "When working on a project, I prefer to:",
+                options: [
+                    { text: "Follow a step-by-step plan or a logical sequence.", style: "Sequential" },
+                    { text: "Work in bursts, making connections and leaps, even if it's not strictly linear.", style: "Global" }
+                ]
+            },
+            {
+                text: "I am more comfortable with:",
+                options: [
+                    { text: "Practical, hands-on activities and real-world examples.", style: "Sensing" },
+                    { text: "Theoretical concepts and abstract ideas.", style: "Intuitive" }
+                ]
+            },
+            {
+                text: "I learn best when the material is presented:",
+                options: [
+                    { text: "In a structured, orderly manner, building step-by-step.", style: "Sequential" },
+                    { text: "In a way that allows me to see connections to other subjects or the broader implications.", style: "Global" }
+                ]
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        // Scores for VARK (Visual, Auditory, Read/Write, Kinesthetic)
+        const varkScores = { V: 0, A: 0, R: 0, K: 0 };
+        // Scores for Processing (Active, Reflective, Sensing, Intuitive, Sequential, Global)
+        const processingScores = { Active: 0, Reflective: 0, Sensing: 0, Intuitive: 0, Sequential: 0, Global: 0 };
+
+        const questionNumberElement = document.getElementById('question-number');
+        const questionTextElement = document.getElementById('question-text');
+        const optionsElement = document.getElementById('options');
+        const resultsElement = document.getElementById('results');
+        const varkResultsElement = document.getElementById('vark-results');
+        const processingResultsElement = document.getElementById('processing-results');
+
+        function displayQuestion() {
+            if (currentQuestionIndex < questions.length) {
+                const question = questions[currentQuestionIndex];
+                questionNumberElement.textContent = `Question ${currentQuestionIndex + 1}/${questions.length}`;
+                questionTextElement.textContent = question.text;
+                optionsElement.innerHTML = ''; // Clear previous options
+
+                question.options.forEach(option => {
+                    const button = document.createElement('button');
+                    button.classList.add('option-button');
+                    button.textContent = option.text;
+                    button.addEventListener('click', () => handleAnswer(option.style));
+                    optionsElement.appendChild(button);
+                });
+            } else {
+                showResults();
+            }
+        }
+
+        function handleAnswer(style) {
+            // Update scores based on the question type
+            if (currentQuestionIndex < 10) { // VARK questions (1-10)
+                varkScores[style]++;
+            } else { // Processing questions (11-15)
+                 processingScores[style]++;
+            }
+
+            currentQuestionIndex++;
+            displayQuestion();
+        }
+
+        function calculateVarkPreference() {
+            const maxScore = Math.max(...Object.values(varkScores));
+            const preferredStyles = Object.keys(varkScores).filter(style => varkScores[style] === maxScore);
+
+            if (preferredStyles.length === 1) {
+                return `Your primary preference is **${getVarkStyleName(preferredStyles[0])}** (${preferredStyles[0]}).`;
+            } else if (preferredStyles.length > 1 && preferredStyles.length < 4) {
+                 const styleNames = preferredStyles.map(s => getVarkStyleName(s)).join(', ');
+                 return `You have a multimodal preference, leaning towards **${styleNames}** (${preferredStyles.join('')}).`;
+            } else {
+                 return "You have a strong multimodal preference, comfortable with all styles (VARK).";
+            }
+        }
+
+         function getVarkStyleName(styleCode) {
+            switch(styleCode) {
+                case 'V': return 'Visual';
+                case 'A': return 'Auditory';
+                case 'R': return 'Read/Write';
+                case 'K': return 'Kinesthetic';
+                default: return styleCode;
+            }
+         }
+
+
+        function calculateProcessingPreferences() {
+            let results = "";
+
+            // Active vs Reflective (from Q12)
+            results += `<p><strong>Processing (How you prefer to process information):</strong> ${processingScores.Active > processingScores.Reflective ? 'You lean towards **Active** processing (learning by doing).' : processingScores.Reflective > processingScores.Active ? 'You lean towards **Reflective** processing (learning by thinking).' : 'You have a balance of Active and Reflective processing.'}</p>`;
+
+             // Sensing vs Intuitive (from Q14)
+            results += `<p><strong>Perception (How you prefer to take in information):</strong> ${processingScores.Sensing > processingScores.Intuitive ? 'You lean towards **Sensing** perception (focusing on facts and practicalities).' : processingScores.Intuitive > processingScores.Sensing ? 'You lean towards **Intuitive** perception (focusing on concepts and theories).' : 'You have a balance of Sensing and Intuitive perception.'}</p>`;
+
+            // Sequential vs Global (from Q11, Q13, Q15)
+            const sequentialScore = processingScores.Sequential;
+            const globalScore = processingScores.Global;
+            results += `<p><strong>Organization (How you prefer to organize and progress):</strong> ${sequentialScore > globalScore ? 'You lean towards **Sequential** organization (learning step-by-step).' : globalScore > sequentialScore ? 'You lean towards **Global** organization (seeing the big picture and connections).' : 'You have a balance of Sequential and Global organization.'}</p>`;
+
+
+            return results;
+        }
+
+        function showResults() {
+            questionNumberElement.style.display = 'none';
+            questionTextElement.style.display = 'none';
+            optionsElement.style.display = 'none';
+            resultsElement.classList.remove('hidden');
+
+            // Display VARK results
+            varkResultsElement.innerHTML = `<h3>Sensory Preferences (How you prefer to take in information):</h3><p>${calculateVarkPreference()}</p>`;
+
+            // Display Processing results
+            processingResultsElement.innerHTML = `<h3>Cognitive Preferences (How you prefer to process information):</h3>${calculateProcessingPreferences()}`;
+        }
+
+        // Start the game
+        displayQuestion();
+
+    </script>
+</body>
+</html>
